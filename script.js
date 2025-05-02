@@ -1599,9 +1599,7 @@ document.getElementById('downloadBtn').addEventListener('click', () => {
   document.body.removeChild(link);
 });
 
-document.getElementById('downloadDefaultBtn').addEventListener('click', async function () {
-  // use AJAX to fetch default creature, spell, mat, passive, rdb csv files
-  const xhr = new XMLHttpRequest();
+document.getElementById('downloadDefaultBtn').addEventListener('click', () => {
 
   const filenames = [
     "creature.csv",
@@ -1611,26 +1609,15 @@ document.getElementById('downloadDefaultBtn').addEventListener('click', async fu
     "rdb.csv"
   ];
 
-  for (const filename of filenames) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', filename, true);
-    xhr.onload = function() {
-      if (xhr.status === 200) {
-        const blob = new Blob([xhr.responseText], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
+  // download
 
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", filename);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else {
-        console.error('Error fetching the default file.');
-      }
-    };
-    xhr.onerror = function() {
-      console.error('Request failed.');
-    };
-  }
+  filenames.forEach(filename => {
+    const link = document.createElement("a");
+    link.setAttribute("href", `./${filename}`);
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+
 });
