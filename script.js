@@ -1532,6 +1532,8 @@ document.getElementById('toggleBuildPlanner').addEventListener('click', () => {
     content.appendChild(div);
 
     const div2 = document.createElement('div');
+    div2.className = 'planner-creature-data';
+    div2.dataset.correspondingCreature = index + 1; // Store the corresponding creature object
     content.appendChild(div2);
 
     // Generate fields
@@ -1574,6 +1576,62 @@ document.getElementById('toggleBuildPlanner').addEventListener('click', () => {
   });
   
   Object.values(plannerCreatures).forEach(creature => creature.reset());
+});
+
+
+
+document.getElementById('exportBuild').addEventListener('click', () => {
+  const isHidden = document.getElementById('buildPlannerContent').style.display === 'none';
+  if (isHidden) {
+    alert("Please open the build planner to export the data.");
+    return;
+  }
+
+
+  let buildData = JSON.stringify(plannerCreatures);
+  // clipboard copy the build data
+  navigator.clipboard.writeText(buildData).then(() => {
+    console.log('Build data copied to clipboard!');
+  }).catch(err => {
+    console.error('Could not copy build data: ', err);
+  });
+});
+
+
+document.getElementById('importBuild').addEventListener('click', async function () {
+  const el = document.getElementById('buildPlannerContent');
+  if (getComputedStyle(el).display === 'none') {
+    return alert("please open the build planner to import the data");
+  }
+  
+  let text;
+  try {
+    text = await navigator.clipboard.readText();
+  } catch {
+    text = prompt("please paste the build data here:");
+    if (!text) return console.error("no valid build data provided");
+  }
+  
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch (err) {
+    return console.error("invalid json build data:", err);
+  }
+  
+  Object.entries(parsed).forEach(([key, data]) => {
+    if (plannerCreatures[key]) {
+      // shallow-merge; consider deep clone if nested properties matter
+      Object.assign(plannerCreatures[key], data);
+    }
+  });
+  
+  // re-render all creatures
+  Object.values(plannerCreatures).forEach((creature, idx) => {
+    const container = document.querySelector(`.planner-creature-data[data-corresponding-creature="${idx+1}"]`);
+    container.innerHTML = '';
+    container.appendChild(creature.toHTML());
+  });
 });
 
 
