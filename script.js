@@ -1599,7 +1599,7 @@ document.getElementById('downloadBtn').addEventListener('click', () => {
   document.body.removeChild(link);
 });
 
-document.getElementById('downloadDefaultBtn').addEventListener('click', () => {
+document.getElementById('downloadDefaultBtn').addEventListener('click', async function () {
   // use AJAX to fetch default creature, spell, mat, passive, rdb csv files
   const xhr = new XMLHttpRequest();
 
