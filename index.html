@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Siralim Ultimate: Rune Of Lua Wiki</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Siralim Ultimate: Rune Of Lua Wiki</h1>
+    <div class="upload-section">
+        <input type="file" id="csvFiles" multiple accept = ".csv">
+        <button id="importBtn">Import CSV Files</button>
+    </div>
+    <div class="download-section">
+        <button id="downloadBtn">Download Randomized creature.csv</button>
+    </div>
+
+    <div class="build-planner-section">
+      <h3>Build Planner</h3>
+      <button id="toggleBuildPlanner">Toggle Build Planner</button>
+    
+      <div id="buildPlannerContent" style="display: none;">
+        <h4>Main</h4>
+      </div>
+    </div>
+
+
+    <div id="query-editor">
+      <h3>Query Editor</h3>
+      
+      <!-- Table selection -->
+      <label>
+        Table:
+        <select id="tableSelect">
+          <option value="" selected disabled hidden>Choose here</option>
+          <option value="creature">creature</option>
+          <option value="passive">passive</option>
+          <option value="mat">mat</option>
+          <option value="spell">spell</option>
+          <option value="rdb">rdb</option>
+          <!-- add more tables as needed -->
+        </select>
+      </label>
+      <br>
+      <!-- Column selection -->
+      <label>
+        Column:
+        <div id="columnSelectContainer"></div>
+      </label>
+      <br>
+      
+      <!-- Global logic operator -->
+      <label>
+        Combine all clauses with:
+        <select id="globalLogicOperator">
+          <option value="AND">AND</option>
+          <option value="OR">OR</option>
+        </select>
+      </label>
+      <br>
+      
+      <!-- Root group for WHERE clause tree -->
+      <div id="whereGroup" class="group">
+        <div class="group-header">
+          <button class="addClause">Add Clause</button>
+        </div>
+        <div class="group-body"></div>
+      </div>
+      <br>
+      
+      <!-- generate query -->
+      <button id="generateQuery">Generate Query</button>
+      <br>
+      
+      <!-- output area -->
+      <pre id="output"></pre>
+    </div>
+    
+
+    <div class="creature-manager-section">
+      <h3>Randomizer: Creature Manager</h3>
+      <button id="toggleCreatureManager">Toggle Creature Manager</button>
+      <div id="creatureManager" style="display: none;">
+        
+        <!-- Grouping Options -->
+        <label>
+          <input type="checkbox" id="groupByRace">Group By Race
+        </label>
+        <label>
+          <input type="checkbox" id="groupByClass">Group By Class
+        </label>
+    
+        <!-- Blacklist Options -->
+        <h4>Blacklist</h4>
+        <label>
+          <input type="checkbox" id="blacklistRaces"> Don't Randomize Certain Races
+        </label>
+
+        <!-- Blacklist UI (Hidden by Default) -->
+        <div id="blacklistContainer" style="display: none;">
+          <input type="text" id="raceInput" placeholder="Enter race name">
+          <button id="addRaceButton">Add</button>
+          <ul id="blacklistRacesList"></ul>
+        </div>
+
+    
+        <!-- Randomization Toggles -->
+        <h4>Randomization Options</h4>
+        <br>
+        <label>
+          <input type="checkbox" id="deleteBlacklistedCreatures"> Delete Blacklisted Creatures
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" id="addShinies"> Add 100 Shiny Creature Variants To Creature Pool
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" id="randomizeClasses"> Randomize Classes
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" id="randomizeRaces"> Randomize Races
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" id="randomizePassives"> Randomize Passives
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" id="randomizeStats"> Randomize Stats
+        </label>
+    
+        <!-- Stat Randomization Sliders (Hidden by Default) -->
+        <div id="statRandomizationOptions" style="display: none;">
+          <label>
+            Randomize Health: <input type="range" id="randomizeHealth" min="0" max="40" value="20">
+            <span id="healthValue">20</span>
+          </label>
+          <br>
+          <label>
+            Randomize Attack: <input type="range" id="randomizeAttack" min="0" max="40" value="20">
+            <span id="attackValue">20</span>
+          </label>
+          <br>
+          <label>
+            Randomize Defense: <input type="range" id="randomizeDefense" min="0" max="40" value="20">
+            <span id="defenseValue">20</span>
+          </label>
+          <br>
+          <label>
+            Randomize Intelligence: <input type="range" id="randomizeIntelligence" min="0" max="40" value="20">
+            <span id="intelligenceValue">20</span>
+          </label>
+          <br>
+          <label>
+            Randomize Speed: <input type="range" id="randomizeSpeed" min="0" max="40" value="20">
+            <span id="speedValue">20</span>
+          </label>
+        </div>
+        <br>
+    
+        <!-- Execute Randomization -->
+        <button id="randomizeButton">Randomize!</button>
+    
+      </div>
+    </div>
+    
+    <div class="result-section" style="overflow:auto; height: 400px; width: 100%;">
+      <h3>Query Results:</h3>
+      <div class="table-wrapper" style="overflow-x: auto; max-height: 350px; position: relative;">
+        <table id="resultsTable" style="width: 100%; border-collapse: collapse;">
+          <thead id="tableHeaders" style="position: sticky; top: 0; background-color: #fff; z-index: 1;">
+            <tr>
+              <!-- Table headers go here -->
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Table body rows go here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- sql.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/sql-wasm.js"></script>
+  <!-- Link to the JavaScript file -->
+  <script src="script.js"></script>
+</body>
+</html>
