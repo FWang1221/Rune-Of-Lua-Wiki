@@ -1332,7 +1332,7 @@ class PlannerCreature {
   }
 
   popArtifactTrait() {
-    this.artifactMaterials.pop();
+    this.artifactTraits.pop();
     return this;
   }
 
@@ -1565,7 +1565,6 @@ document.getElementById('toggleBuildPlanner').addEventListener('click', () => {
       button.textContent = label;
       button.addEventListener('click', () => {
         planner[method]();
-        input.value = ''; // clear input after setting value
         const newHTML = planner.toHTML();
         div2.innerHTML = ''; // Clear previous content
         div2.appendChild(newHTML); // Append new content
