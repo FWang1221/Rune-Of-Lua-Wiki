@@ -1519,12 +1519,12 @@ document.getElementById('toggleBuild').addEventListener('click', () => {
   Object.values(plannerCreatures).forEach((creature, index) => {
     const planner = creature;
     const fields = [
-      { label: "Set Creature 1", method: "setCreature1" },
-      { label: "Set Fusion Creature 2", method: "setCreature2" },
+      { label: "Set Main Parent", method: "setCreature1" },
+      { label: "Set Secondary Parent", method: "setCreature2" },
+      { label: "Add Artifact Trait", method: "addArtifactTrait" },
+      { label: "Add Artifact Material", method: "addArtifactMaterial" },
       { label: "Set Artifact Spell", method: "setArtifactSpell" },
       { label: "Add Spell", method: "addSpell" },
-      { label: "Add Artifact Material", method: "addArtifactMaterial" },
-      { label: "Add Artifact Trait", method: "addArtifactTrait" },
     ];
 
     const buttonFields = [
