@@ -7,13 +7,13 @@ const creatureColumns = {
   "Nickname": "column10",
   "Race" : "column13",
   "Passive" : "column12",
-  "Health" : "column6",
-  "Attack" : "column2",
-  "Intelligence" : "column7",
-  "Defense" : "column5",
-  "Speed" : "column14",
-  "OverworldSprite" : "column11",
-  "BattleSprite" : "column3",
+  "HP" : "column6",
+  "ATK" : "column2",
+  "INT" : "column7",
+  "DEF" : "column5",
+  "SPD" : "column14",
+  "OSPR" : "column11",
+  "BSPR" : "column3",
   "Mana" : "column8",
   "Tier" : "column15",
   "Tags" : "column16",
@@ -22,14 +22,14 @@ const creatureColumns = {
 const passiveColumns = {
   "ID" : "column1",
   "Name" : "column2",
-  "Description" : "column3",
+  "DESC" : "column3",
 }
 
 const spellColumns = {
   "ID" : "column1",
   "Name" : "column5",
   "Class" : "column2",
-  "Description" : "column3",
+  "DESC" : "column3",
   "Charges" : "column4",
   "Flags" : "column6",
 }
@@ -43,7 +43,7 @@ const matColumns = {
 const rdbColumns = {
   "ID" : "column1",
   "Name" : "column2",
-  "Description" : "column3",
+  "DESC" : "column3",
 }
 
 const joins = [
@@ -354,6 +354,7 @@ document.getElementById("tableSelect").addEventListener("change", function() {
       const option = document.createElement("input");
       option.type = "checkbox";
       option.value = creatureColumns[columnName];
+      option.checked = true; // Check the checkbox by default
       const label = document.createElement("label");
       label.textContent = columnName;
       label.appendChild(option);
@@ -365,6 +366,7 @@ document.getElementById("tableSelect").addEventListener("change", function() {
       const option = document.createElement("input");
       option.type = "checkbox";
       option.value = passiveColumns[columnName];
+      option.checked = true; // Check the checkbox by default
       const label = document.createElement("label");
       label.textContent = columnName;
       label.appendChild(option);
@@ -376,6 +378,7 @@ document.getElementById("tableSelect").addEventListener("change", function() {
       const option = document.createElement("input");
       option.type = "checkbox";
       option.value = spellColumns[columnName];
+      option.checked = true; // Check the checkbox by default
       const label = document.createElement("label");
       label.textContent = columnName;
       label.appendChild(option);
@@ -387,6 +390,7 @@ document.getElementById("tableSelect").addEventListener("change", function() {
       const option = document.createElement("input");
       option.type = "checkbox";
       option.value = matColumns[columnName];
+      option.checked = true; // Check the checkbox by default
       const label = document.createElement("label");
       label.textContent = columnName;
       label.appendChild(option);
@@ -398,6 +402,7 @@ document.getElementById("tableSelect").addEventListener("change", function() {
       const option = document.createElement("input");
       option.type = "checkbox";
       option.value = rdbColumns[columnName];
+      option.checked = true; // Check the checkbox by default
       const label = document.createElement("label");
       label.textContent = columnName;
       label.appendChild(option);
@@ -1500,8 +1505,9 @@ let plannerCreatures = {
 };
 
 
-document.getElementById('toggleBuildPlanner').addEventListener('click', () => {
+document.getElementById('toggleBuild').addEventListener('click', () => {
   const content = document.getElementById('buildPlannerContent');
+  const sidePlanner = document.getElementById('mainBuild');
   const isHidden = content.style.display === 'none';
   content.style.display = isHidden ? 'block' : 'none';
 
@@ -1534,7 +1540,7 @@ document.getElementById('toggleBuildPlanner').addEventListener('click', () => {
     const div2 = document.createElement('div');
     div2.className = 'planner-creature-data';
     div2.dataset.correspondingCreature = index + 1; // Store the corresponding creature object
-    content.appendChild(div2);
+    sidePlanner.appendChild(div2);
 
     // Generate fields
     fields.forEach(({ label, method }) => {
@@ -1677,4 +1683,14 @@ document.getElementById('downloadDefaultBtn').addEventListener('click', () => {
     document.body.removeChild(link);
   });
 
+});
+
+
+
+const build = document.getElementById('mainBuild');
+const toggle = document.getElementById('toggleBuild');
+
+toggle.addEventListener('click', () => {
+  build.classList.toggle('collapsed');
+  toggle.classList.toggle('shifted');
 });

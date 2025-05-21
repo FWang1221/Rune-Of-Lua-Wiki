@@ -2,15 +2,15 @@ body {
     font-family: 'Times New Roman', Times, serif;
     background-color: #f4f4f4;
     margin: 0;
-    padding: 20px;
+    padding: 5px;
+    font-size: 11px;
   }
   
   .container {
-    max-width: 800px;
     margin: 0 auto;
     background-color: #fff;
-    padding: 20px; 
-    border-radius: 5px;
+    padding: 5px; 
+    border-radius: 3px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
   
@@ -19,18 +19,18 @@ body {
   }
   
   .upload-section, .query-section, .result-section {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
   
   textarea {
     width: 100%;
     height: 100px;
-    margin-top: 10px;
+    margin-top: 5px;
   }
   
   button {
-    margin-top: 10px;
-    padding: 10px 15px;
+    margin-top: 5px;
+    padding: 5px 7px;
     background-color: #007bff;
     color: #fff;
     border: none;
@@ -42,17 +42,59 @@ body {
   }
   
   table {
-    width: 100%;
+    width: 55vw; /* or 100%, up to container width */
+    max-width: 55vw;
     border-collapse: collapse;
   }
   
   th, td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 4px;
     text-align: left;
+    max-width: 200px;
+    word-wrap: break-word; /* doesn't exist lol */
+    word-break: break-word; /* use this instead */
+    overflow-wrap: break-word;
+    white-space: normal; /* allow wrapping */
   }
   
   th {
     background-color: #f2f2f2;
   }
   
+  
+
+    #mainBuild {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 45vw;
+    background: #f4f4f4;
+    z-index: 9999;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.4);
+    transition: width 0.3s ease;
+    overflow: auto;
+  }
+
+  #mainBuild.collapsed {
+    width: 0;
+    overflow: hidden;
+  }
+
+  #toggleBuild {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 10000; /* higher than #mainBuild */
+  }
+
+  #toggleBuild.shifted {
+    right: 45vw; /* same as mainBuild width */
+  }
+
+  #mainBuild table {
+    width: 45vw; /* or 100%, up to container width */
+    max-width: 45vw;
+    border-collapse: collapse;
+  }
