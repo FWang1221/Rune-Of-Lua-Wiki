@@ -1504,6 +1504,8 @@ let plannerCreatures = {
   creature6: new PlannerCreature(),
 };
 
+let plannerPerks = {};
+
 
 document.getElementById('toggleBuild').addEventListener('click', () => {
   const content = document.getElementById('buildPlannerContent');
@@ -1512,6 +1514,7 @@ document.getElementById('toggleBuild').addEventListener('click', () => {
   content.style.display = isHidden ? 'block' : 'none';
 
   content.innerHTML = ''; // Clear previous content (if you need to re-render)
+  sidePlanner.innerHTML = ''; // Clear previous content (if you need to re-render)
 
   Object.values(plannerCreatures).forEach((creature, index) => {
     const planner = creature;
@@ -1580,8 +1583,88 @@ document.getElementById('toggleBuild').addEventListener('click', () => {
       div.appendChild(button);
     });
   });
+
+
+  const perkDiv = document.createElement('div');
+  const perkH5 = document.createElement('h5');
+
+  perkH5.textContent = `Manage Perks`;
+  perkDiv.appendChild(perkH5);
+
+  const perkInput = document.createElement('input');
+  perkInput.type = 'text';
+  perkInput.placeholder = "Add Perk";
+  perkDiv.appendChild(perkInput);
+  const perkButton = document.createElement('button');
+  perkButton.textContent = "Add Perk";
+  perkButton.addEventListener('click', () => {
+    const val = perkInput.value;
+    console.log("Value: ", val); // Log the value for debugging
+    const stmt = db.prepare(`SELECT * FROM rdb WHERE column2 = ?`);
+    stmt.bind([val]);
+    if (stmt.step()) {
+      const perkData = stmt.getAsObject();
+      console.log("Perk Data: ", perkData); // Log the perk data for debugging
+      const perkID = perkData.column1;
+      plannerPerks[perkID] = true;
+      perkInput.value = ''; // clear input after setting value
+      const newHTML = document.createElement('h4');
+      newHTML.textContent = `Perk: ${perkData.column2}\nDescription: ${perkData.column3}`;
+      newHTML.classList.add('perk');
+      newHTML.classList.add((perkData.column2).replace(/\s+/g, '-').toLowerCase());
+      perkDiv.appendChild(newHTML); // Append new content
+    } else {
+      alert(`perk "${val}" not found`);
+    }
+  });
+  perkDiv.appendChild(perkButton);
+  const removePerkInput = document.createElement('input');
+  removePerkInput.type = 'text';
+  removePerkInput.placeholder = "Remove Perk";
+  perkDiv.appendChild(removePerkInput);
+  const removePerkButton = document.createElement('button');
+  removePerkButton.textContent = "Remove Perk";
+  removePerkButton.addEventListener('click', () => {
+    const val = removePerkInput.value;
+    console.log("Value: ", val); // Log the value for debugging
+    const allPerkHTMLs = perkDiv.querySelectorAll('.perk');
+    allPerkHTMLs.forEach(perkHTML => {
+      if (perkHTML.classList.contains((val).replace(/\s+/g, '-').toLowerCase())) {
+        perkHTML.remove();
+      }
+    });
+    const stmt = db.prepare(`SELECT * FROM rdb WHERE column2 = ?`);
+    stmt.bind([val]);
+    if (stmt.step()) {
+      const perkData = stmt.getAsObject();
+      console.log("Perk Data: ", perkData); // Log the perk data for debugging
+      const perkID = perkData.column1;
+      delete plannerPerks[perkID];
+    } else {
+      alert(`perk "${val}" not found`);
+    }
+    removePerkInput.value = ''; // clear input after setting value
+  });
+  perkDiv.appendChild(removePerkButton);
+  const perkResetButton = document.createElement('button');
+  perkResetButton.textContent = "Reset Perks";
+  perkResetButton.addEventListener('click', () => {
+    console.log("Resetting: ", plannerPerks); // Log the value for debugging
+    const allPerkHTMLs = perkDiv.querySelectorAll('.perk');
+    allPerkHTMLs.forEach(perkHTML => {
+      perkHTML.remove();
+    });
+    // remove the perk from the plannerPerks object
+    Object.keys(plannerPerks).forEach(key => {
+      plannerPerks[key] = null;
+      delete plannerPerks[key];
+    });
+  });
+  perkDiv.appendChild(perkResetButton);
+  content.appendChild(perkDiv);
   
   Object.values(plannerCreatures).forEach(creature => creature.reset());
+  plannerPerks = {};
 });
 
 
@@ -1594,7 +1677,10 @@ document.getElementById('exportBuild').addEventListener('click', () => {
   }
 
 
-  let buildData = JSON.stringify(plannerCreatures);
+  let buildData = JSON.stringify({
+    creatures : plannerCreatures,
+    perks : plannerPerks,
+  });
   // clipboard copy the build data
   navigator.clipboard.writeText(buildData).then(() => {
     console.log('Build data copied to clipboard!');
@@ -1624,8 +1710,11 @@ document.getElementById('importBuild').addEventListener('click', async function 
   } catch (err) {
     return console.error("invalid json build data:", err);
   }
+
+  let creatures = parsed.creatures;
+  let perks = parsed.perks;
   
-  Object.entries(parsed).forEach(([key, data]) => {
+  Object.entries(creatures).forEach(([key, data]) => {
     if (plannerCreatures[key]) {
       // shallow-merge; consider deep clone if nested properties matter
       Object.assign(plannerCreatures[key], data);
@@ -1637,6 +1726,32 @@ document.getElementById('importBuild').addEventListener('click', async function 
     const container = document.querySelector(`.planner-creature-data[data-corresponding-creature="${idx+1}"]`);
     container.innerHTML = '';
     container.appendChild(creature.toHTML());
+  });
+
+  // re-render perks
+  const perkDiv = document.getElementById('buildPlannerContent').querySelector('div:last-child');
+  const perkHTMLs = perkDiv.querySelectorAll('.perk');
+  perkHTMLs.forEach(perkHTML => {
+    perkHTML.remove();
+  });
+  Object.entries(perks).forEach(([key, value]) => {
+    if (value) {
+      const stmt = db.prepare(`SELECT * FROM rdb WHERE column1 = ?`);
+      stmt.bind([key]);
+      if (stmt.step()) {
+        const perkData = stmt.getAsObject();
+        console.log("Perk Data: ", perkData); // Log the perk data for debugging
+        const perkID = perkData.column1;
+        plannerPerks[perkID] = true;
+        const newHTML = document.createElement('h4');
+        newHTML.textContent = `Perk: ${perkData.column2}\nDescription: ${perkData.column3}`;
+        newHTML.classList.add('perk');
+        newHTML.classList.add((perkData.column2).replace(/\s+/g, '-').toLowerCase());
+        perkDiv.appendChild(newHTML); // Append new content
+      } else {
+        alert(`perk "${key}" not found`);
+      }
+    }
   });
 });
 
