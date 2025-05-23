@@ -1859,3 +1859,10 @@ toggle.addEventListener('click', () => {
   build.classList.toggle('collapsed');
   toggle.classList.toggle('shifted');
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    document.getElementById("importBtn").click();
+  }, 1000);
+});
