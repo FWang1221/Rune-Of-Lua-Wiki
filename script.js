@@ -66,16 +66,44 @@ const joins = [
 var db; // Global variable for the database
 
 document.getElementById("importBtn").addEventListener("click", async function () {
-  const csvFiles = document.getElementById('csvFiles').files;
-  if (csvFiles.length === 0) {
-    alert("Please upload CSV files first!");
-    return;
+  const fileInput = document.getElementById('csvFiles');
+  const uploadedFiles = fileInput.files;
+
+  let filesToUse = [];
+
+  if (uploadedFiles.length > 0) {
+    filesToUse = Array.from(uploadedFiles);
+  } else {
+    // no uploaded files, fetch defaults from server
+    const defaultFilenames = [
+      "creature.csv",
+      "spell.csv",
+      "mat.csv",
+      "passive.csv",
+      "rdb.csv"
+    ];
+
+    try {
+      const fetches = await Promise.all(
+        defaultFilenames.map(async filename => {
+          const res = await fetch(`./${filename}`);
+          if (!res.ok) throw new Error(`could not fetch ${filename}`);
+          const blob = await res.blob();
+          return new File([blob], filename, { type: blob.type });
+        })
+      );
+      filesToUse = fetches;
+    } catch (err) {
+      console.error("error loading default files:", err);
+      alert("could not load default files from server");
+      return;
+    }
   }
 
   // Load sql.js using the CDN
   const SQL = await initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/${file}` });
 
-
+  const csvFiles = filesToUse.filter(file => file.name.endsWith('.csv'));
   // Create an in-memory database
   db = new SQL.Database();
   for (const file of csvFiles) {
@@ -361,6 +389,13 @@ document.getElementById("tableSelect").addEventListener("change", function() {
   const columnSelects = document.getElementById("columnSelectContainer");
   if (!columnSelects) return; // Check if the container exists
   console.log("Selected table: ", table);
+
+  // Clear existing options in the column dropdowns
+  const clauseElements = document.querySelectorAll(".clause");
+  clauseElements.forEach(clause => {
+    clause.remove(); // Remove existing clauses
+  });
+
 
   // Update the column dropdowns based on the selected table
   columnSelects.innerHTML = ""; // Clear existing options
