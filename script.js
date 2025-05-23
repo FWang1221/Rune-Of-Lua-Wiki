@@ -321,6 +321,21 @@ function createClause() {
     }
   }
 
+  if (table === 'rdb') {
+    const columnSelect = clause.querySelector(".columnInput");
+
+    // Clear existing options
+    columnSelect.innerHTML = "<option value=''>Select column</option>";
+
+    // Iterate over rdbColumns to populate the dropdown with column names
+    for (const columnName in rdbColumns) {
+      const option = document.createElement("option");
+      option.value = rdbColumns[columnName];  // Set the actual column identifier
+      option.textContent = columnName;  // Set the user-friendly column name
+      columnSelect.appendChild(option);
+    }
+  }
+
   // when operator is BETWEEN, show second value input
   const operatorSelect = clause.querySelector(".operatorSelect");
   const betweenLabel = clause.querySelector(".betweenSecond");
